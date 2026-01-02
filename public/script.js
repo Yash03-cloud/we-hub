@@ -406,7 +406,7 @@ loginForm?.addEventListener('submit', async (e) => {
         hero_headline: "Safer Steps, Stronger Communities",
         hero_subheadline: "Empowering women with instant emergency alerts, live location sharing, and community support for safer journeys every day.",
         features_title: "Powerful Features for Your Safety",
-        footer_copyright: "© 2024 SafeSteps. All rights reserved. Made with ❤️ for women's safety."
+        footer_copyright: "© 2024 We-hub. All rights reserved. Made with ❤️ for women's safety."
       };
 
       const onConfigChange = async (config) => {
