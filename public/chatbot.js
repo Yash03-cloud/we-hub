@@ -6,21 +6,88 @@ const input = document.getElementById("ws-input");
 const sendBtn = document.getElementById("ws-send");
 const body = document.getElementById("ws-body");
 
+const API_KEY = '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';
+
+// Chatbot Training Dataset: Q&A pairs based on We-hub website details
+const chatbotDataset = [
+  {
+    question: "what is we-hub",
+    answer: "We-hub is a comprehensive women safety platform designed to empower women with tools for personal security, emergency response, and community support. It provides instant access to safety features, emergency contacts, and resources to help users feel safer during daily activities."
+  },
+  {
+    question: "how does the sos button work",
+    answer: "The one-tap SOS button triggers immediate alerts to saved emergency contacts via SMS. It includes your location data and a Google Maps link for precise coordinates. You can save and manage emergency contact numbers in the popup interface."
+  },
+  {
+    question: "what are the emergency helpline numbers",
+    answer: "Verified helpline numbers include: Women Helpline: 1091, Emergency Services: 112, Domestic Violence Helpline: 181, Child Helpline: 1098. These are available in the Safety Resources popup."
+  },
+  {
+    question: "how do i share my location",
+    answer: "Use the 'Share Location' button to start real-time GPS tracking. Your location will be shared with trusted contacts or emergency services. It can also activate automatically during an SOS alert."
+  },
+  {
+    question: "what safety tips do you have",
+    answer: "Stay aware of your surroundings, maintain strong body posture, learn simple blocking and escape moves, know your rights under IPC Section 354, and have emergency contacts saved. Download our Emergency Guide PDF for more details."
+  },
+  {
+    question: "how do i report an emergency",
+    answer: "You can report emergencies via the dedicated form or one-tap SOS button. Include your name, location (GPS detected), description, and contact number. Alerts are sent to emergency services and stored for admin review."
+  },
+  {
+    question: "what is the community support feature",
+    answer: "Connect with a network of women who share experiences, provide help, and offer safety tips. It's designed to create stronger, safer communities through mutual support."
+  },
+  {
+    question: "how do i sign up for we-hub",
+    answer: "Click the 'Signup' button and fill in your personal details, email, phone, password, and emergency contacts. Your information is securely stored and passwords are hashed for protection."
+  },
+  {
+    question: "what is the self-defense page",
+    answer: "The self-defense page provides guidance on awareness, body posture, blocking moves, and legal rights. You can submit a form to express interest in training or get more information."
+  },
+  {
+    question: "how does the chatbot work",
+    answer: "I'm the Women Safety Assistant, powered by AI. I can provide advice on emergencies, helplines, reporting, self-defense, and safety tips. If I can't answer directly, I'll use external resources."
+  },
+  {
+    question: "what features does we-hub have",
+    answer: "Key features include: Live Location Sharing, One-Tap SOS, Alert Contacts, Safety Resources with helplines, Community Support, Emergency Reporting, Self-Defense Guidance, and a built-in Chatbot."
+  },
+  {
+    question: "how do i contact support",
+    answer: "Use the Contact form on the website to send inquiries, feedback, or support requests. You can also email support@We-hub.com or call +1 (555) 123-SAFE for 24/7 support."
+  },
+  {
+    question: "is my data safe",
+    answer: "Yes, We-hub prioritizes privacy and security. Passwords are hashed, location data is shared only with consent during emergencies, and all information complies with safety standards."
+  },
+  {
+    question: "what is the emergency guide pdf",
+    answer: "The downloadable Emergency Guide PDF contains detailed safety tips, legal information, self-defense techniques, and emergency procedures. Click the download button in the Resources section."
+  },
+  {
+    question: "how does the map work",
+    answer: "The integrated Google Maps shows your current location and nearby safe zones. It helps you identify secure areas and provides directions if needed."
+  }
+];
+
 openBtn.onclick = () => chatbot.style.display = "flex";
 closeBtn.onclick = () => chatbot.style.display = "none";
 
 sendBtn.onclick = sendMsg;
 input.addEventListener("keydown", e => e.key === "Enter" && sendMsg());
 
-function sendMsg() {
+async function sendMsg() {
   const text = input.value.trim();
   if (!text) return;
 
   addMsg(text, "user-msg");
   input.value = "";
 
-  setTimeout(() => {
-    addMsg(getBotReply(text.toLowerCase()), "bot-msg");
+  setTimeout(async () => {
+    const reply = await getBotReply(text.toLowerCase());
+    addMsg(reply, "bot-msg");
   }, 400);
 }
 
@@ -32,77 +99,46 @@ function addMsg(text, cls) {
   body.scrollTop = body.scrollHeight;
 }
 
-function getBotReply(msg) {
-  msg = (msg || "").toLowerCase();
-  msg = msg.replace(/[^a-z0-9\s]/g, " "); // keep letters and numbers
-
-  // Expanded keywords and datasets
-  const dangerWords = ["danger", "unsafe", "help now", "help now!", "attacked", "attack"];
-  const emergencyWords = ["emergency", "urgent", "immediate" ];
-  const helplineWords = ["helpline", "hotline", "number", "contact number", "call"];
-  const harassmentWords = ["harassment", "stalking", "molest", "harass", "harassed"];
-  const domesticWords = ["domestic", "violence", "abuse", "husband", "partner", "boyfriend"];
-  const lawWords = ["law", "rights", "legal", "police", "FIR", "report"];
-  const selfDefWords = ["self defense", "self-defence", "self defense", "defend", "protect myself", "selfdefence"];
-  const safetyWords = ["safety", "tips", "precaution", "secure", "stay safe"];
-  const aboutWords = ["about", "what is this", "what is this site", "site", "website", "purpose"];
-  const featuresWords = ["features", "what can this site do", "capabilities", "services"];
-  const reportHowWords = ["how to report", "report", "file a complaint", "file an FIR", "how to register"];
-  const contactWords = ["contact", "email", "reach", "support"];
-  const resourcesWords = ["resources", "help", "ngo", "shelter", "counseling", "support group"];
-
-  // Helper for matching
-  function hasAny(list) {
-    return list.some(w => msg.includes(w));
+async function getBotReply(msg) {
+  // First, check the local dataset for a matching question
+  const matchedQA = chatbotDataset.find(qa =>
+    msg.includes(qa.question) || qa.question.includes(msg)
+  );
+  if (matchedQA) {
+    return matchedQA.answer;
   }
 
-  // Immediate danger / emergency
-  if (hasAny(dangerWords) || hasAny(emergencyWords)) {
-    return "🚨 If you are in immediate danger:\n• Call your local emergency number (India: 112).\n• Move to a safe, populated area if possible.\n• Share your live location with someone you trust.\n• If possible, call the helpline below for support.";
+  // If no match in dataset, fall back to API
+  try {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'openai/gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a helpful safety chatbot for women, providing advice on emergencies, helplines, reporting, self-defense, and safety tips. Use the provided dataset for accurate responses about We-hub features.'
+          },
+          {
+            role: 'user',
+            content: msg
+          }
+        ]
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('API request failed');
+    }
+
+    const data = await response.json();
+    return data.choices[0].message.content;
+  } catch (error) {
+    console.error('Error fetching bot reply:', error);
+    return "Sorry, I'm having trouble responding right now. Please try again later or contact emergency services if needed.";
   }
-
-  // Helplines
-  if (hasAny(helplineWords) || hasAny(resourcesWords)) {
-    return "📞 Helplines & support:\n• Emergency (India): 112\n• Women helpline (India): 181\n• Anti-human trafficking: 1091\nIf you are outside India, please call your country's emergency services. You can also visit the 'Self Defence' page or contact local NGOs listed on this site.";
-  }
-
-  // Harassment / stalking
-  if (hasAny(harassmentWords) || hasAny(domesticWords)) {
-    return "Harassment or abuse is a crime. Steps you can take:\n• Preserve evidence (messages, photos).\n• File a police report or FIR.\n• Contact a local NGO or shelter for confidential support.\n• Call helplines listed here for immediate assistance.";
-  }
-
-  // Legal / reporting
-  if (hasAny(lawWords) || hasAny(reportHowWords)) {
-    return "To report an incident:\n• Note date/time/location and any witness names.\n• Keep copies of messages or evidence.\n• Visit your local police station to file a complaint (FIR in India).\n• If you want confidential help, contact a local NGO for guidance.";
-  }
-
-  // Self-defence
-  if (hasAny(selfDefWords) || msg.includes("selfdefence")) {
-    return `🥋 Self-defence resources and tips are available on this site: ${window.location.origin + window.location.pathname.replace(/[^\/]+$/, '')}selfdefence.html\nBasic tips: aim for eyes/nose/throat, use loud voice, run to safety.`;
-  }
-
-  // Safety tips
-  if (hasAny(safetyWords)) {
-    return "💡 Safety tips:\n• Keep your phone charged and carry a power bank.\n• Share your trip details with someone trusted.\n• Avoid isolated places at night.\n• Learn basic escape moves and trust your instincts.";
-  }
-
-  // About the website / features
-  if (hasAny(aboutWords) || hasAny(featuresWords)) {
-    return "This website helps with personal safety for women: safety tips, self-defence guidance, helpline numbers, a reporting mechanism, and an admin dashboard for alerts. You can view the Self Defence page and use the chatbot for quick help.";
-  }
-
-  // Contact / support
-  if (hasAny(contactWords)) {
-    return "Contact & support:\n• For technical site issues, check the admin section if you are an admin.\n• For safety support, use the helplines above or reach local NGOs.\n• This site does not replace emergency services.";
-  }
-
-  // Greetings
-  if (msg.includes("hello") || msg.includes("hi") || msg.includes("hey")) return "Hello 👋 I’m here to help you stay safe. Ask about helplines, reporting, or self-defence.";
-
-  // If user asks about pages directly
-  if (msg.includes("selfdefence") || msg.includes("self defence")) return `See self-defence resources: ${window.location.origin + window.location.pathname.replace(/[^\/]+$/, '')}selfdefence.html`;
-  if (msg.includes("admin") || msg.includes("dashboard")) return "Admin pages: use the Admin Login (if you have credentials) to manage alerts and users.";
-
-  // Default fallback with suggestions
-  return "I can help with:\n• Emergency help and helplines\n• Safety tips and self-defence resources\n• How to report incidents\n• Where to find shelters and NGOs\nPlease ask clearly (for example: 'How do I report harassment?' or 'Show self defence tips').";
 }
