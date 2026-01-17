@@ -718,18 +718,10 @@ function initMap() {
     });
 
     // Marker for user location (optional)
-    const userMarker = new google.maps.Marker({
+    const userMarker = new google.maps.marker.AdvancedMarkerElement({
         position: defaultLocation,
         map: map,
-        title: "You are here",
-        icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 8,
-            fillColor: "#4285F4",
-            fillOpacity: 1,
-            strokeWeight: 2,
-            strokeColor: "#ffffff"
-        }
+        title: "You are here"
     });
 
     // Places service to find nearby police, hospitals, shelters
@@ -745,7 +737,7 @@ function initMap() {
         }, (results, status) => {
             if (status === google.maps.places.PlacesServiceStatus.OK && results) {
                 results.forEach(place => {
-                    const marker = new google.maps.Marker({
+                    const marker = new google.maps.marker.AdvancedMarkerElement({
                         map: map,
                         position: place.geometry.location,
                         title: place.name
