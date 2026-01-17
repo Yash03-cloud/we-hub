@@ -630,7 +630,7 @@ document.getElementById("save-sos-btn").addEventListener("click", async () => {
       const { latitude, longitude } = await getPos();
 
       // 1️⃣ Save in MongoDB (include coords when present)
-      const saveRes = await fetch("http://localhost:5000/save-sos", {
+      const saveRes = await fetch("https://we-hub.onrender.com/save-sos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ number, latitude, longitude })
@@ -656,7 +656,7 @@ document.getElementById("save-sos-btn").addEventListener("click", async () => {
       try { storedUser = JSON.parse(localStorage.getItem('user') || 'null'); } catch(e) { storedUser = null; }
       const senderName = storedUser ? (storedUser.firstName || (storedUser.email && storedUser.email.split('@')[0]) || 'USER') : 'USER';
 
-      const smsRes = await fetch("http://localhost:5000/send-sos", {
+      const smsRes = await fetch("https://we-hub.onrender.com/send-sos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ number, latitude, longitude, name: senderName })
@@ -801,7 +801,7 @@ document.addEventListener("DOMContentLoaded", () => {
           try { storedUser = JSON.parse(localStorage.getItem('user') || 'null'); } catch(e) { storedUser = null; }
           const senderName = storedUser ? (storedUser.firstName || (storedUser.email && storedUser.email.split('@')[0]) || 'USER') : 'USER';
 
-          await fetch("http://localhost:5000/send-sos", {
+          await fetch("https://we-hub.onrender.com/send-sos", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ number: num, latitude, longitude, name: senderName })
@@ -833,7 +833,7 @@ document.getElementById("contact-form").addEventListener("submit", async (e) => 
     newsletter: document.getElementById("contact-newsletter").checked
   };
 
-  await fetch("http://localhost:5000/api/contacts", {
+  await fetch("https://we-hub.onrender.com/api/contacts", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)

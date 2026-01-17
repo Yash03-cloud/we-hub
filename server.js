@@ -7,7 +7,7 @@ const twilio = require("twilio");
 const bcrypt = require("bcryptjs");
 require('dotenv').config();
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 // -------------------------
 // MIDDLEWARES

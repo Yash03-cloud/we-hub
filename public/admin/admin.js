@@ -77,7 +77,7 @@ loadAdminData();
 
 
 async function loadContacts() {
-  const res = await fetch("http://localhost:5000/api/contacts");
+  const res = await fetch("https://we-hub.onrender.com/api/contacts");
   const contacts = await res.json();
 
   const tbody = document.querySelector("#contactsTable tbody");
