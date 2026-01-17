@@ -801,7 +801,7 @@ document.addEventListener("DOMContentLoaded", () => {
           try { storedUser = JSON.parse(localStorage.getItem('user') || 'null'); } catch(e) { storedUser = null; }
           const senderName = storedUser ? (storedUser.firstName || (storedUser.email && storedUser.email.split('@')[0]) || 'USER') : 'USER';
 
-          await fetch("http://localhost:5000/send-sos", {
+          await fetch("https://we-hub.onrender.com/send-sos", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ number: num, latitude, longitude, name: senderName })

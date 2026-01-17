@@ -1177,7 +1177,7 @@ document.querySelector('[aria-label="SOS emergency button"]').addEventListener("
     try { storedUser = JSON.parse(localStorage.getItem('user') || 'null'); } catch(e) { storedUser = null; }
     const senderName = storedUser ? (storedUser.firstName || (storedUser.email && storedUser.email.split('@')[0]) || 'USER') : 'USER';
 
-    fetch("http://localhost:5000/report", {
+    fetch("https://we-hub.onrender.com/report", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -1343,7 +1343,7 @@ document.addEventListener("DOMContentLoaded", () => {
         try { storedUser = JSON.parse(localStorage.getItem('user') || 'null'); } catch(e) { storedUser = null; }
         const senderName = storedUser ? (storedUser.firstName || (storedUser.email && storedUser.email.split('@')[0]) || 'USER') : 'USER';
 
-        const res = await fetch("http://localhost:5000/send-sos", {
+        const res = await fetch("https://we-hub.onrender.com/send-sos", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ number, name: senderName })
