@@ -6,7 +6,7 @@ const input = document.getElementById("ws-input");
 const sendBtn = document.getElementById("ws-send");
 const body = document.getElementById("ws-body");
 
-const API_KEY = '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';
+const API_KEY = 'd1ef517a-1dcb-4a8b-96b6-dcf3a038838c';
 
 // Chatbot Training Dataset: Q&A pairs based on We-hub website details
 const chatbotDataset = [
@@ -110,14 +110,14 @@ async function getBotReply(msg) {
 
   // If no match in dataset, fall back to API
   try {
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const response = await fetch('https://api.sambanova.ai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${API_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'openai/gpt-3.5-turbo',
+        model: 'llama3-8b-instruct',
         messages: [
           {
             role: 'system',
