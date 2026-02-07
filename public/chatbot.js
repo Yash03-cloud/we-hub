@@ -6,7 +6,7 @@ const input = document.getElementById("ws-input");
 const sendBtn = document.getElementById("ws-send");
 const body = document.getElementById("ws-body");
 
-const API_KEY = 'd1ef517a-1dcb-4a8b-96b6-dcf3a038838c';
+const API_KEY = 'AIzaSyCWujraZuKviV1aGPJw2ksSD0GDcBro5wg';
 
 // Chatbot Training Dataset: Q&A pairs based on We-hub website details
 const chatbotDataset = [
@@ -108,35 +108,29 @@ async function getBotReply(msg) {
     return matchedQA.answer;
   }
 
-  // If no match in dataset, fall back to API
+  // If no match in dataset, fall back to Gemini API for dynamic responses
   try {
-    const response = await fetch('https://api.sambanova.ai/v1/chat/completions', {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${API_KEY}`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${API_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'llama3-8b-instruct',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a helpful safety chatbot for women, providing advice on emergencies, helplines, reporting, self-defense, and safety tips. Use the provided dataset for accurate responses about We-hub features.'
-          },
-          {
-            role: 'user',
-            content: msg
-          }
-        ]
+        contents: [{
+          parts: [{
+            text: `You are a helpful safety chatbot for women, providing advice on emergencies, helplines, reporting, self-defense,always ans in under 30 words and safety tips. Use the provided dataset for accurate responses about We-hub features when relevant. For general questions, provide smart, context-aware answers. Always prioritize safety and accuracy.\n\nDataset: ${JSON.stringify(chatbotDataset)}\n\nUser: ${msg}`
+          }]
+        }]
       })
     });
 
     if (!response.ok) {
+      console.error('API response status:', response.status, response.statusText);
       throw new Error('API request failed');
     }
 
     const data = await response.json();
-    return data.choices[0].message.content;
+    return data.candidates[0].content.parts[0].text;
   } catch (error) {
     console.error('Error fetching bot reply:', error);
     return "Sorry, I'm having trouble responding right now. Please try again later or contact emergency services if needed.";

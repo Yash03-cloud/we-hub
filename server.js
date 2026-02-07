@@ -257,12 +257,17 @@ app.get("/admin/logout", (req, res) => {
   res.sendFile(path.join(__dirname, "public/admin/admin-logout.html"));
 });
 
+// Serve chatbot.js explicitly
+app.get('/chatbot.js', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'chatbot.js'));
+});
+
 // -------------------------
 // START SERVER
 // -------------------------
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
- 
+
 });
 
 app.post("/signup", async (req, res) => {
