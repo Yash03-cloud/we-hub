@@ -263,6 +263,39 @@ app.get('/chatbot.js', (req, res) => {
 });
 
 // -------------------------
+// GENERATIVE LANGUAGE PROXY
+// -------------------------
+app.post('/api/generate', async (req, res) => {
+  try {
+    const prompt = req.body.prompt || '';
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }]
+        })
+      }
+    );
+
+    if (!response.ok) {
+      const text = await response.text();
+      console.error('Generative API error:', response.status, text);
+      return res.status(502).json({ error: 'Generative API error' });
+    }
+
+    const data = await response.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    res.json({ text });
+  } catch (err) {
+    console.error('Error proxying generate:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// -------------------------
 // START SERVER
 // -------------------------
 app.listen(PORT, () => {

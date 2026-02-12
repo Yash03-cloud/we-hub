@@ -6,7 +6,7 @@ const input = document.getElementById("ws-input");
 const sendBtn = document.getElementById("ws-send");
 const body = document.getElementById("ws-body");
 
-const API_KEY = 'AIzaSyCWujraZuKviV1aGPJw2ksSD0GDcBro5wg';
+// API key moved to server-side .env — frontend calls /api/generate
 
 // Chatbot Training Dataset: Q&A pairs based on We-hub website details
 const chatbotDataset = [
@@ -110,27 +110,22 @@ async function getBotReply(msg) {
 
   // If no match in dataset, fall back to Gemini API for dynamic responses
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${API_KEY}`, {
+    // Send prompt to server which uses the key from .env
+    const prompt = `You are a helpful safety chatbot for women, providing advice on emergencies, helplines, reporting, self-defense, always ans in under 30 words and safety tips. Use the provided dataset for accurate responses about We-hub features when relevant. For general questions, provide smart, context-aware answers. Always prioritize safety and accuracy.\n\nDataset: ${JSON.stringify(chatbotDataset)}\n\nUser: ${msg}`;
+
+    const response = await fetch('/api/generate', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{
-            text: `You are a helpful safety chatbot for women, providing advice on emergencies, helplines, reporting, self-defense,always ans in under 30 words and safety tips. Use the provided dataset for accurate responses about We-hub features when relevant. For general questions, provide smart, context-aware answers. Always prioritize safety and accuracy.\n\nDataset: ${JSON.stringify(chatbotDataset)}\n\nUser: ${msg}`
-          }]
-        }]
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
     });
 
     if (!response.ok) {
-      console.error('API response status:', response.status, response.statusText);
+      console.error('Server generative API error:', response.status, response.statusText);
       throw new Error('API request failed');
     }
 
     const data = await response.json();
-    return data.candidates[0].content.parts[0].text;
+    return data.text || "Sorry, I'm having trouble responding right now. Please try again later or contact emergency services if needed.";
   } catch (error) {
     console.error('Error fetching bot reply:', error);
     return "Sorry, I'm having trouble responding right now. Please try again later or contact emergency services if needed.";
